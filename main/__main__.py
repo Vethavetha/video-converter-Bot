@@ -1,19 +1,22 @@
-cask "macx-video-converter-pro" do
-  version "3.12.3"
-  sha256 :no_check
+import glob
+from pathlib import Path
+from main.utils import load_plugins
+import logging
+from . import Drone
 
-  url "https://www.macxdvd.com/download/macx-video-converter-pro.dmg"
-  name "MacX Video Converter Pro"
-  desc "Tool to convert, edit, download & resize videos"
-  homepage "https://www.macxdvd.com/mac-video-converter-pro/"
+logging.basicConfig(format='[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s',
+                    level=logging.WARNING)
 
-  livecheck do
-    url "https://www.macxdvd.com/mac-video-converter-pro/upgrade/video-converter-pro.xml"
-    # `LastestVersion` is an upstream typo of `LatestVersion`
-    regex(%r{LastestVersion</key>\s*<string>(\d+(?:\.\d+)+)<}i)
-  end
+path = "main/plugins/*.py"
+files = glob.glob(path)
+for name in files:
+    with open(name) as a:
+        patt = Path(a.name)
+        plugin_name = patt.stem
+        load_plugins(plugin_name.replace(".py", ""))
 
-  app "MacX Video Converter Pro.app"
+print("Successfully deployed!")
+print("#MaheshChauhan • #DroneBots")
 
-  zap trash: "~/Library/Preferences/com.macxdvd.macxvdoconverterpro.plist"
-end
+if __name__ == "__main__":
+    Drone.run_until_disconnected()
